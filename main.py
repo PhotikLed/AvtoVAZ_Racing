@@ -19,6 +19,8 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = 1000, 210
         self.get_configurations()
+        self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')
+        self.gudok.set_volume(0.1)
 
     def get_configurations(self):
         # with open('configurations.txt', encoding='utf8') as conf:  # все что ниже будем брать из txt. пока затычка
@@ -34,19 +36,45 @@ class Car(pygame.sprite.Sprite):
             self.rect.y += self.turn_speed
         if keys[pygame.K_a]:
             self.rect.y -= self.turn_speed  # скорость поворота
+        if keys[pygame.K_b]:
+            self.gudok.play()
 
+
+class Traffic_car(pygame.sprite.Sprite):
+    image = pygame.image.load('traffic_spirities/traf1.png')
+    image = pygame.transform.scale(image, (200, 100))
+
+    def __init__(self, *groups):
+        super(Traffic_car, self).__init__(*groups)
+        self.image = Traffic_car.image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = random.randint(0, 250), random.randint(10, 545)
+
+    def update(self, current_speed):
+        self.rect.x += 3
+
+
+traffic_sprites = pygame.sprite.Group()
+for i in range(5):
+    Traffic_car(traffic_sprites)
+
+main_sprites = pygame.sprite.Group()
+car = Car(main_sprites)
 
 clock = pygame.time.Clock()
-all_sprites = pygame.sprite.Group()
-car = Car(all_sprites)
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     screen.blit(bg, (0, 0))
-    all_sprites.draw(screen)
-    all_sprites.update()
+
+    main_sprites.draw(screen)
+    main_sprites.update()
+
+    traffic_sprites.draw(screen)
+    traffic_sprites.update(10)
+
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()

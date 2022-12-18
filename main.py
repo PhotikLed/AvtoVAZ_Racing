@@ -12,12 +12,13 @@ bg = pygame.image.load('spirities/trassa.png')  # фон
 class Car(pygame.sprite.Sprite):
     image = pygame.image.load('spirities/2109.png')
     image = pygame.transform.scale(image, (200, 100))  # уменьшаем изображение
+    image = pygame.transform.rotate(image, 180)
 
     def __init__(self, *group):
         super(Car, self).__init__(*group)
         self.image = Car.image
         self.rect = self.image.get_rect()
-        self.rect.topleft = 1000, 210
+        self.rect.topleft = 20, 205
         self.get_configurations()
         self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')
         self.gudok.set_volume(0.1)
@@ -32,6 +33,7 @@ class Car(pygame.sprite.Sprite):
         self.has_fco = True
         self.has_migalka = False
         self.has_nitro = True
+        self.has_turbo = True
 
 
     def update(self):
@@ -40,22 +42,23 @@ class Car(pygame.sprite.Sprite):
             self.rect.y += self.turn_speed
         if keys[pygame.K_a]:
             self.rect.y -= self.turn_speed  # скорость поворота
-        if keys[pygame.K_b]:
+        if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
 
 
 class Traffic_car(pygame.sprite.Sprite):
     image = pygame.image.load('traffic_spirities/traf1.png')
     image = pygame.transform.scale(image, (200, 100))
+    image = pygame.transform.rotate(image, 180)
 
     def __init__(self, *groups):
         super(Traffic_car, self).__init__(*groups)
         self.image = Traffic_car.image
         self.rect = self.image.get_rect()
-        self.rect.center = random.randint(0, 250), random.randint(40, 545)
+        self.rect.topleft = random.randint(900, 1100), random.randint(10, 545)
 
     def update(self, current_speed):
-        self.rect.x += 3
+        self.rect.x -= 3
 
 
 traffic_sprites = pygame.sprite.Group()

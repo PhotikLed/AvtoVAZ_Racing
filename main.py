@@ -29,6 +29,10 @@ class Car(pygame.sprite.Sprite):
         self.turn_speed = 4  # скорость поворота
         self.max_speed = 100  # макс. скорость автомобиля
         self.coef_scep = 5  # коэффициент сцепления (про запас)
+        self.has_fco = True
+        self.has_migalka = False
+        self.has_nitro = True
+
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -48,7 +52,7 @@ class Traffic_car(pygame.sprite.Sprite):
         super(Traffic_car, self).__init__(*groups)
         self.image = Traffic_car.image
         self.rect = self.image.get_rect()
-        self.rect.topleft = random.randint(0, 250), random.randint(10, 545)
+        self.rect.center = random.randint(0, 250), random.randint(40, 545)
 
     def update(self, current_speed):
         self.rect.x += 3
@@ -74,7 +78,6 @@ while running:
 
     traffic_sprites.draw(screen)
     traffic_sprites.update(10)
-
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()

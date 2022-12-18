@@ -22,6 +22,7 @@ class Car(pygame.sprite.Sprite):
         self.get_configurations()
         self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')
         self.gudok.set_volume(0.1)
+        pygame.mixer.music.load('TazMusic/yakuba.mp3')
 
     def get_configurations(self):
         # with open('configurations.txt', encoding='utf8') as conf:  # все что ниже будем брать из txt. пока затычка
@@ -34,7 +35,6 @@ class Car(pygame.sprite.Sprite):
         self.has_migalka = False
         self.has_nitro = True
         self.has_turbo = True
-
 
     def update(self):
         keys = pygame.key.get_pressed()

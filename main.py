@@ -29,8 +29,10 @@ class Car(pygame.sprite.Sprite):
         #     text = conf.readlines()
 
         self.turn_speed = 4  # скорость поворота
-        self.max_speed = 100  # макс. скорость автомобиля
+        self.max_speed = 50  # макс. скорость автомобиля
+        self.min_speed = 5
         self.current_speed = 5
+
         self.coef_scep = 5  # коэффициент сцепления (про запас)
         self.has_fco = True
         self.has_migalka = False
@@ -45,11 +47,13 @@ class Car(pygame.sprite.Sprite):
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < height:
             self.rect.y += self.turn_speed  # скорость поворота
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины (пока без ограничений)
-            traffic_speed += 1
-            road_speed += 1
+            if traffic_speed != self.max_speed:
+                traffic_speed += 1
+                road_speed += 1
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            traffic_speed -= 1
-            road_speed -= 1
+            if traffic_speed != self.min_speed:
+                traffic_speed -= 1
+                road_speed -= 1
         if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
 
@@ -113,6 +117,7 @@ while running:
     traffic_sprites.draw(screen)
     traffic_sprites.update(traffic_speed)
     spawn_traffic(random.randint(0, 100))
+
     print(road_speed)
     pygame.display.flip()
     clock.tick(fps)

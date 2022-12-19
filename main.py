@@ -30,6 +30,7 @@ class Car(pygame.sprite.Sprite):
 
         self.turn_speed = 4  # скорость поворота
         self.max_speed = 100  # макс. скорость автомобиля
+        self.current_speed = 5
         self.coef_scep = 5  # коэффициент сцепления (про запас)
         self.has_fco = True
         self.has_migalka = False
@@ -37,11 +38,18 @@ class Car(pygame.sprite.Sprite):
         self.has_turbo = True
 
     def update(self):
+        global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
             self.rect.y -= self.turn_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < height:
             self.rect.y += self.turn_speed  # скорость поворота
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины (пока без ограничений)
+            traffic_speed += 1
+            road_speed += 1
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            traffic_speed -= 1
+            road_speed -= 1
         if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
 
@@ -64,14 +72,17 @@ class Traffic_car(pygame.sprite.Sprite):
             self.rect.topleft = width + 100, random.randint(390 + 180 * (line // 2 - 1), 610 + 180 * (line // 2 - 1))
             self.image = pygame.transform.rotate(self.image, 180)
 
-    def update(self, current_speed):
+    def update(self, speed):
         if self.line in [0, 1]:
-            self.rect.x -= 15
+            self.rect.x -= 15 + speed
         if self.line in [2, 3]:
-            self.rect.x -= 3
+            self.rect.x -= speed
 
         if self.rect.right < 0:
             pygame.sprite.Sprite.kill(self)
+
+
+traffic_speed = 3
 
 
 def spawn_traffic(n):  # спавнится машина, если выпадет карта
@@ -84,7 +95,9 @@ main_sprites = pygame.sprite.Group()
 car = Car(main_sprites)
 
 road_n = 0
+road_speed = 2
 clock = pygame.time.Clock()
+fps = 60
 running = True
 while running:
     for event in pygame.event.get():
@@ -92,15 +105,15 @@ while running:
             running = False
 
     screen.blit(animation_road[road_n // 4], (0, 0))
-    road_n += 1
-    road_n = (road_n + 1) % 60
+    road_n = (road_n + road_speed) % 60
 
     main_sprites.draw(screen)
     main_sprites.update()
 
     traffic_sprites.draw(screen)
-    traffic_sprites.update(10)
+    traffic_sprites.update(traffic_speed)
     spawn_traffic(random.randint(0, 100))
+    print(road_speed)
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(fps)
 pygame.quit()

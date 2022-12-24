@@ -140,7 +140,7 @@ while running:
     traffic_sprites.update(traffic_speed)
     spawn_traffic(random.randint(0, 50))
 
-    text_surface = my_font.render('Счёт: ' + str(int(car.score)), False, 'red')
+    text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
     screen.blit(text_surface, (1150, 0))
 
     # print(road_speed)

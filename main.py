@@ -17,6 +17,7 @@ class Car(pygame.sprite.Sprite):
     image = pygame.transform.rotate(image, 180)
 
     score = 0
+
     def __init__(self, *group):
         super(Car, self).__init__(*group)
         self.image = Car.image
@@ -112,6 +113,10 @@ traffic_speed = 5
 clock = pygame.time.Clock()
 fps = 60
 
+pygame.font.init()
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
+# font
+
 timer_interval = 1000  # 1 seconds
 timer_event = pygame.USEREVENT + 1
 pygame.time.set_timer(timer_event, timer_interval)
@@ -122,7 +127,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == timer_event:
-            car.score += 1
+            car.score += 1 + (road_speed - 4) / 10
             print(car.score)
 
     screen.blit(animation_road[road_n // 4], (0, 0))
@@ -134,6 +139,9 @@ while running:
     traffic_sprites.draw(screen)
     traffic_sprites.update(traffic_speed)
     spawn_traffic(random.randint(0, 50))
+
+    text_surface = my_font.render('Счёт: ' + str(int(car.score)), False, 'red')
+    screen.blit(text_surface, (1150, 0))
 
     # print(road_speed)
     pygame.display.flip()

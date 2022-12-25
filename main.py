@@ -4,6 +4,8 @@ import sys
 import pygame
 
 pygame.init()
+pygame.font.init()
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
 pygame.display.set_caption('АвтоВАЗ_Гонки')
 size = WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -12,15 +14,13 @@ animation_road = [pygame.transform.scale(pygame.image.load(f'spirities/roads/roa
 
 
 class Car(pygame.sprite.Sprite):
-    image = pygame.image.load('spirities/2109.png')
-    image = pygame.transform.scale(image, (200, 100))  # уменьшаем изображение
-    image = pygame.transform.rotate(image, 180)
-
     score = 0
 
-    def __init__(self, *group):
+    def __init__(self, name, *group):
         super(Car, self).__init__(*group)
-        self.image = Car.image
+        self.image = pygame.image.load(f'spirities/tazy/{name}')
+        self.image = pygame.transform.scale(self.image, (200, 100))  # уменьшаем изображение
+        self.image = pygame.transform.rotate(self.image, 180)
 
         self.rect = self.image.get_rect()
         self.rect.topleft = 20, 205
@@ -110,22 +110,25 @@ def terminate():
 
 def start_screen():
     intro_text = ["Если ты зачетный парень, если выглядишь атас,",
-                  "то наверное ты знаешь что такое АвтоВАЗ",
+                  "то наверное ты знаешь что такое АвтоВАЗ.",
                   "",
-                  "Выбери любимый автомобиль"]
+                  "Выбери любимый автомобиль:"]
 
     fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     pygame.draw.rect(screen, 'gray', (0, 0, 1280, 240))
-    text_coord = 20
+    text_coord = 10
+
     for line in intro_text:
-        string_rendered = my_font.render(line, 1, 'red')
+        string_rendered = my_font.render(line, True, 'red')
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+    record = my_font.render('Ваш рекорд: ' + '1млн.', True, 'green')
+    screen.blit(record, (1000, 50))
 
     while True:
         for event in pygame.event.get():
@@ -140,17 +143,13 @@ def start_screen():
 
 traffic_sprites = pygame.sprite.Group()
 main_sprites = pygame.sprite.Group()
-car = Car(main_sprites)
+car = Car('2109.png', main_sprites)
 
 road_n = 0
 road_speed = 4
 traffic_speed = 5
 clock = pygame.time.Clock()
 fps = 60
-
-pygame.font.init()
-my_font = pygame.font.SysFont('Comic Sans MS', 30)
-# font
 
 timer_interval = 1000  # 1 seconds
 timer_event = pygame.USEREVENT + 1

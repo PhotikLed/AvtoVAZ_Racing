@@ -5,7 +5,7 @@ import pygame
 
 pygame.init()
 pygame.display.set_caption('АвтоВАЗ_Гонки')
-size = width, height = 1280, 720
+size = WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode(size)
 
 animation_road = [pygame.transform.scale(pygame.image.load(f'spirities/roads/road{i}.png'), size) for i in range(16)]
@@ -54,7 +54,7 @@ class Car(pygame.sprite.Sprite):
             sys.exit()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
             self.rect.y -= self.turn_speed
-        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < height:
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < HEIGHT:
             self.rect.y += self.turn_speed  # скорость поворота
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины (пока без ограничений)
             if traffic_speed < self.max_speed:
@@ -83,9 +83,9 @@ class Traffic_car(pygame.sprite.Sprite):
 
     def set_position(self, line):  # напраление и место появления в зависимости от полосы
         if line in [0, 1]:
-            self.rect.topleft = width + 100, random.randint(10 + 180 * line, 70 + 180 * line)
+            self.rect.topleft = WIDTH + 100, random.randint(10 + 180 * line, 70 + 180 * line)
         if line in [2, 3]:
-            self.rect.topleft = width + 100, random.randint(390 + 180 * (line // 2 - 1), 610 + 180 * (line // 2 - 1))
+            self.rect.topleft = WIDTH + 100, random.randint(390 + 180 * (line // 2 - 1), 610 + 180 * (line // 2 - 1))
             self.image = pygame.transform.rotate(self.image, 180)
 
     def update(self, speed):
@@ -101,6 +101,41 @@ class Traffic_car(pygame.sprite.Sprite):
 def spawn_traffic(n):  # спавнится машина, если выпадет карта
     if n == 0:
         Traffic_car(traffic_sprites)
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen():
+    intro_text = ["Если ты зачетный парень, если выглядишь атас,",
+                  "то наверное ты знаешь что такое АвтоВАЗ",
+                  "",
+                  "Выбери любимый автомобиль"]
+
+    fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    pygame.draw.rect(screen, 'gray', (0, 0, 1280, 240))
+    text_coord = 20
+    for line in intro_text:
+        string_rendered = my_font.render(line, 1, 'red')
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        pygame.display.flip()
+        clock.tick(50)
 
 
 traffic_sprites = pygame.sprite.Group()
@@ -120,6 +155,8 @@ my_font = pygame.font.SysFont('Comic Sans MS', 30)
 timer_interval = 1000  # 1 seconds
 timer_event = pygame.USEREVENT + 1
 pygame.time.set_timer(timer_event, timer_interval)
+
+start_screen()
 
 running = True
 while running:

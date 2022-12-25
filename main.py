@@ -24,11 +24,15 @@ class Car(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.rect.topleft = 20, 205
-        self.mask = pygame.mask.from_surface(self.image)
+        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
+        print(self.image.get_width(), self.image.get_height())
+
+        pygame.draw.ellipse(surf, 'white', (self.image.get_rect()))  # тут фигня с модернизированной коллизией
+        self.mask = pygame.mask.from_surface(surf)
 
         self.get_configurations()
 
-        self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')
+        self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')  # гудок
         self.gudok.set_volume(0.1)
         pygame.mixer.music.load('TazMusic/yakuba.mp3')
 
@@ -50,6 +54,9 @@ class Car(pygame.sprite.Sprite):
     def update(self):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
+        for trafs in traffic_sprites:
+            if pygame.sprite.collide_mask(car, trafs):
+                terminate()
         if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
             sys.exit()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
@@ -75,8 +82,10 @@ class Traffic_car(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super(Traffic_car, self).__init__(*groups)
         self.image = Traffic_car.image
-        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
+        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
+        pygame.draw.ellipse(surf, 'white', (self.image.get_rect()))
+        self.mask = pygame.mask.from_surface(surf)
 
         self.line = random.randint(0, 3)  # задание полосы
         self.set_position(self.line)
@@ -108,7 +117,7 @@ def terminate():
     sys.exit()
 
 
-def start_screen():
+def start_screen():  # менюшка
     intro_text = ["Если ты зачетный парень, если выглядишь атас,",
                   "то наверное ты знаешь что такое АвтоВАЗ.",
                   "",
@@ -134,16 +143,18 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if x in range(10, 1280) \
+                        and y in range(100, 720):  # ты сюда пока не смотри, это заготовка под стрелочки выбора машинки.
+                    # а пока тут перемычка
+                    return '2109.png'
         pygame.display.flip()
         clock.tick(50)
 
 
 traffic_sprites = pygame.sprite.Group()
 main_sprites = pygame.sprite.Group()
-car = Car('2109.png', main_sprites)
 
 road_n = 0
 road_speed = 4
@@ -155,7 +166,8 @@ timer_interval = 1000  # 1 seconds
 timer_event = pygame.USEREVENT + 1
 pygame.time.set_timer(timer_event, timer_interval)
 
-start_screen()
+taz = start_screen()
+car = Car(taz, main_sprites)
 
 running = True
 while running:

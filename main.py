@@ -25,9 +25,11 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = 20, 205
         surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
-        print(self.image.get_width(), self.image.get_height())
+        x1, y1, x2, y2 = self.image.get_rect()
+        print(x1, x2, y1, y2)
 
-        pygame.draw.ellipse(surf, 'white', (self.image.get_rect()))  # тут фигня с модернизированной коллизией
+        pygame.draw.rect(surf, 'white',
+                            (x1 + 30, y1 + 30, x2 - 30, y2 - 30))  # тут фигня с модернизированной коллизией
         self.mask = pygame.mask.from_surface(surf)
 
         self.get_configurations()
@@ -55,7 +57,7 @@ class Car(pygame.sprite.Sprite):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
         for trafs in traffic_sprites:
-            if pygame.sprite.collide_mask(car, trafs):
+            if pygame.sprite.collide_mask(trafs, car):
                 terminate()
         if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
             sys.exit()
@@ -84,7 +86,8 @@ class Traffic_car(pygame.sprite.Sprite):
         self.image = Traffic_car.image
         self.rect = self.image.get_rect()
         surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
-        pygame.draw.ellipse(surf, 'white', (self.image.get_rect()))
+        x1, y1, x2, y2 = self.image.get_rect()
+        pygame.draw.rect(surf, 'white', (x1 + 30, y1 + 30, x2 - 30, y2 - 30))
         self.mask = pygame.mask.from_surface(surf)
 
         self.line = random.randint(0, 3)  # задание полосы
@@ -98,6 +101,9 @@ class Traffic_car(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.image, 180)
 
     def update(self, speed):
+        for trafs in traffic_sprites:
+            if pygame.sprite.collide_mask(trafs, car):
+                terminate()
         if self.line in [0, 1]:
             self.rect.x -= 15 + speed
         if self.line in [2, 3]:

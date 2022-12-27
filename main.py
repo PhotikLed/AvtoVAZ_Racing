@@ -57,10 +57,10 @@ class Car(pygame.sprite.Sprite):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
         for trafs in traffic_sprites:
-            if pygame.sprite.collide_mask(trafs, car):
+            if pygame.sprite.collide_mask(car, trafs):
                 terminate()
-        if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
-            sys.exit()
+        # if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
+        #     sys.exit()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
             self.rect.y -= self.turn_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < HEIGHT:

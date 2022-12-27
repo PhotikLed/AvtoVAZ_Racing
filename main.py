@@ -24,12 +24,12 @@ class Car(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.rect.topleft = 20, 205
-        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
+        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))  # не работает
         x1, y1, x2, y2 = self.image.get_rect()
         print(x1, x2, y1, y2)
 
         pygame.draw.rect(surf, 'white',
-                            (x1 + 30, y1 + 30, x2 - 30, y2 - 30))  # тут фигня с модернизированной коллизией
+                         (x1 + 30, y1 + 30, x2 - 30, y2 - 30))  # тут фигня с модернизированной коллизией
         self.mask = pygame.mask.from_surface(surf)
 
         self.get_configurations()
@@ -56,7 +56,7 @@ class Car(pygame.sprite.Sprite):
     def update(self):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
-        for trafs in traffic_sprites:
+        for trafs in traffic_sprites:  # не работает
             if pygame.sprite.collide_mask(car, trafs):
                 terminate()
         # if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
@@ -85,7 +85,7 @@ class Traffic_car(pygame.sprite.Sprite):
         super(Traffic_car, self).__init__(*groups)
         self.image = Traffic_car.image
         self.rect = self.image.get_rect()
-        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))
+        surf = pygame.Surface((self.image.get_width(), self.image.get_height()))  # не работает
         x1, y1, x2, y2 = self.image.get_rect()
         pygame.draw.rect(surf, 'white', (x1 + 30, y1 + 30, x2 - 30, y2 - 30))
         self.mask = pygame.mask.from_surface(surf)
@@ -101,9 +101,9 @@ class Traffic_car(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.image, 180)
 
     def update(self, speed):
-        for trafs in traffic_sprites:
-            if pygame.sprite.collide_mask(trafs, car):
-                terminate()
+        # for trafs in traffic_sprites:
+        #     if pygame.sprite.collide_mask(trafs, car):  # не работает
+        #         terminate()
         if self.line in [0, 1]:
             self.rect.x -= 15 + speed
         if self.line in [2, 3]:

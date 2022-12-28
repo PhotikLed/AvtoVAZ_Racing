@@ -6,6 +6,7 @@ import pygame
 pygame.init()
 pygame.font.init()
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
+big_font = pygame.font.SysFont('Comic Sans MS', 70)
 pygame.display.set_caption('АвтоВАЗ_Гонки')
 size = WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -156,7 +157,9 @@ def start_screen():  # менюшка
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
     record = my_font.render('Ваш рекорд: ' + '1млн.', True, 'green')
+    start = big_font.render('Старт', True, 'white')
 
     strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
     # right_button = pygame.transform.scale(strelka, (100, 20))
@@ -164,6 +167,7 @@ def start_screen():  # менюшка
     left_button = pygame.transform.rotate(right_button, 180)
 
     pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+    screen.blit(start, (1040, 600))
 
     screen.blit(record, (1000, 50))
     screen.blit(right_button, (1050, 400))
@@ -238,7 +242,7 @@ while running:
 
     text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
     screen.blit(text_surface, (1150, 0))
-    text_surface = my_font.render('Speed: ' + str(traffic_speed), True, 'red')
+    text_surface = my_font.render('Скорость: ' + str(traffic_speed), True, 'red')
     screen.blit(text_surface, (0, 0))
 
     pygame.display.flip()

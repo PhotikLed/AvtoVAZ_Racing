@@ -140,7 +140,29 @@ def start_screen():  # менюшка
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
     record = my_font.render('Ваш рекорд: ' + '1млн.', True, 'green')
+
+    strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
+    # right_button = pygame.transform.scale(strelka, (100, 20))
+    right_button = strelka
+    left_button = pygame.transform.rotate(right_button, 180)
+
+    pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+
     screen.blit(record, (1000, 50))
+    screen.blit(right_button, (1050, 400))
+    screen.blit(left_button, (30, 400))
+
+    car = '2101.png'
+
+    jiga01 = pygame.image.load('spirities/tazy/2101.png')
+    jiga01 = pygame.transform.rotate(jiga01, 180)
+    jiga01 = pygame.transform.scale(jiga01, (400, 200))
+
+    jiga09 = pygame.image.load('spirities/tazy/2109.png')
+    jiga09 = pygame.transform.rotate(jiga09, 180)
+    jiga09 = pygame.transform.scale(jiga09, (200, 100))
+
+    screen.blit(jiga01, (400, 400))
 
     while True:
         for event in pygame.event.get():
@@ -148,10 +170,16 @@ def start_screen():  # менюшка
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if x in range(10, 1280) \
-                        and y in range(100, 720):  # ты сюда пока не смотри, это заготовка под стрелочки выбора машинки.
-                    # а пока тут перемычка
-                    return '2109.png'
+                if x in range(1000, 1280) and \
+                        y in range(600, 720):
+                    return car
+
+                if y in range(400, 550):
+                    if x in range(1050, 1280):
+                        screen.
+                        car = '2109.png'
+                    elif x in range(10, 310):
+                        car = '2101.png'
         pygame.display.flip()
         clock.tick(50)
 

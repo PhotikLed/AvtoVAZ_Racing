@@ -193,7 +193,6 @@ def start_screen():  # менюшка
 
                 if y in range(400, 550):
                     if x in range(1050, 1280):
-                        screen.
                         car = '2109.png'
                     elif x in range(10, 310):
                         car = '2101.png'

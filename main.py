@@ -7,6 +7,7 @@ pygame.init()
 pygame.font.init()
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
 big_font = pygame.font.SysFont('Comic Sans MS', 70)
+vaz_font = pygame.font.SysFont('Impact', 50)
 pygame.display.set_caption('АвтоВАЗ_Гонки')
 size = WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode(size)
@@ -162,6 +163,11 @@ def start_screen():  # менюшка
     left_button = pygame.transform.rotate(right_button, 180)
 
     pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+
+    beton = pygame.image.load('spirities/roads/beton.png')
+    beton = pygame.transform.scale(beton, (450, 300))
+    screen.blit(beton, (410, 325))
+
     screen.blit(start, (1040, 600))
 
     screen.blit(record, (1000, 50))
@@ -176,9 +182,19 @@ def start_screen():  # менюшка
 
     jiga09 = pygame.image.load('spirities/tazy/2109.png')
     jiga09 = pygame.transform.rotate(jiga09, 180)
-    jiga09 = pygame.transform.scale(jiga09, (200, 100))
+    jiga09 = pygame.transform.scale(jiga09, (400, 200))
 
-    screen.blit(jiga01, (400, 400))
+    priora = pygame.image.load('spirities/tazy/priora.png')
+    priora = pygame.transform.rotate(priora, 180)
+    priora = pygame.transform.scale(priora, (400, 200))
+
+    cars = [jiga01, jiga09, priora]
+    names_cars = ['2101.png', '2109.png', 'priora.png']
+    blits_cars = [vaz_font.render(n.split('.')[0].capitalize(), True, 'orange') for n in names_cars]
+    index = 0
+
+    screen.blit(jiga01, (435, 400))
+    screen.blit(blits_cars[index], (480, 345))
 
     while True:
         for event in pygame.event.get():
@@ -192,10 +208,17 @@ def start_screen():  # менюшка
 
                 if y in range(400, 550):
                     if x in range(1050, 1280):
-
-                        car = '2109.png'
+                        screen.blit(beton, (410, 325))
+                        index = (index + 1) % 3
+                        screen.blit(cars[index], (435, 400))
+                        screen.blit(blits_cars[index], (480, 345))
+                        car = names_cars[index]
                     elif x in range(10, 310):
-                        car = '2101.png'
+                        screen.blit(beton, (410, 325))
+                        index = abs((index - 1) % 3)
+                        screen.blit(cars[index], (435, 400))
+                        screen.blit(blits_cars[index], (480, 345))
+                        car = names_cars[index]
         pygame.display.flip()
         clock.tick(fps)
 

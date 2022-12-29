@@ -51,11 +51,6 @@ class Car(pygame.sprite.Sprite):
     def update(self):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
-        # for trafs in traffic_sprites:  # не работает
-        #     if pygame.sprite.collide_mask(self, trafs):
-        #         terminate()
-        # if pygame.sprite.groupcollide(main_sprites, traffic_sprites, True, False):
-        #     sys.exit()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
             self.rect.y -= self.turn_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < HEIGHT:
@@ -197,6 +192,7 @@ def start_screen():  # менюшка
 
                 if y in range(400, 550):
                     if x in range(1050, 1280):
+
                         car = '2109.png'
                     elif x in range(10, 310):
                         car = '2101.png'

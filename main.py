@@ -1,5 +1,6 @@
 import random
 import sys
+import sqlite3
 
 import pygame
 
@@ -16,7 +17,7 @@ screen = pygame.display.set_mode(size)
 class Car(pygame.sprite.Sprite):
     score = 0
 
-    def __init__(self, name, *group):
+    def __init__(self, name: str, *group):
         super(Car, self).__init__(*group)
         self.image = pygame.image.load(f'spirities/tazy/{name}')
         self.image = pygame.transform.scale(self.image, (200, 100))  # уменьшаем изображение
@@ -29,15 +30,15 @@ class Car(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(surf)
         self.rect.topleft = 20, 400
 
-        self.get_configurations()
+        self.get_configurations(name.split('.')[0])
 
         self.gudok = pygame.mixer.Sound('sounds/avtomobilnyiy-gudok.mp3')  # гудок
         self.gudok.set_volume(0.1)
         pygame.mixer.music.load('TazMusic/yakuba.mp3')
 
-    def get_configurations(self):
-        # with open('configurations.txt', encoding='utf8') as conf:  # все что ниже будем брать из txt. пока затычка
-        #     text = conf.readlines()
+    def get_configurations(self, name):
+        con = sqlite3.connect('sysparams/tuning.db')
+        cur = con.cursor()
 
         self.turn_speed = 5  # скорость поворота
         self.max_speed = 50  # макс. скорость автомобиля
@@ -49,6 +50,8 @@ class Car(pygame.sprite.Sprite):
         self.has_nitro = True
         self.has_turbo = True
 
+        con.close()
+
     def update(self):
         global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
@@ -56,7 +59,7 @@ class Car(pygame.sprite.Sprite):
             self.rect.y -= self.turn_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < HEIGHT:
             self.rect.y += self.turn_speed  # скорость поворота
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины (пока без ограничений)
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины
             if traffic_speed < self.max_speed:
                 traffic_speed += 1
                 road_speed += 1
@@ -94,7 +97,8 @@ class Traffic_car(pygame.sprite.Sprite):
 
     def update(self, speed):
         for trafs in traffic_sprites:
-            if pygame.sprite.collide_mask(trafs, car):  # не работает
+            if pygame.sprite.collide_mask(trafs, car):  # коллизия
+                save_record(car.score)
                 terminate()
         if not self.reverse:
             self.rect.x -= 15 + speed
@@ -129,6 +133,21 @@ def spawn_traffic(n):
         Traffic_car(1, traffic_sprites)  # поток
 
 
+def get_record():
+    with open('sysparams/record.txt', encoding='utf-8') as record:
+        record = record.readline()
+        return record
+
+
+def save_record(rec):
+    with open('sysparams/record.txt', encoding='utf-8') as shet:
+        shet = int(float(shet.readline()))
+        rec = int(float(rec))
+    if shet < rec:
+        with open('sysparams/record.txt', encoding='utf-8', mode='w+') as new_record:
+            new_record.write(str(rec))
+
+
 def terminate():
     pygame.quit()
     sys.exit()
@@ -154,7 +173,7 @@ def start_screen():  # менюшка
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
-    record = my_font.render('Ваш рекорд: ' + '1млн.', True, 'green')
+    record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
     start = big_font.render('Старт', True, 'white')
 
     strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
@@ -243,10 +262,11 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            save_record(car.score)
+            terminate()
         if event.type == timer_event:
             car.score += 1 + (traffic_speed - 5) / 10
-            print(car.score)
+            # print(car.score)
 
     screen.blit(render_road(road_shift), (0, 0))  # блит дороги
     road_shift = (road_shift + 1) % (200 / road_speed)
@@ -259,11 +279,13 @@ while running:
 
     spawn_traffic(random.randint(0, 100 - traffic_speed))
 
-    text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
+    text_surface = my_font.render('Счёт: ' + str(car.score), True, 'red')
     screen.blit(text_surface, (1150, 0))
     text_surface = my_font.render('Скорость: ' + str(traffic_speed), True, 'red')
     screen.blit(text_surface, (0, 0))
 
     pygame.display.flip()
     clock.tick(fps)
+
+save_record(car.score)
 pygame.quit()

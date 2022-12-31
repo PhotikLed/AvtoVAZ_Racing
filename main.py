@@ -39,16 +39,21 @@ class Car(pygame.sprite.Sprite):
     def get_configurations(self, name):
         con = sqlite3.connect('sysparams/tuning.db')
         cur = con.cursor()
+        sql = 'SELECT * FROM params WHERE car_id IN (SELECT id FROM cars WHERE car == ?)'
+        params = cur.execute(sql, (name,)).fetchone()
+        print(params)
 
-        self.turn_speed = 5  # скорость поворота
-        self.max_speed = 50  # макс. скорость автомобиля
-        self.min_speed = 5
+        self.coef_scep = params[1]  # коэффициент сцепления (про запас)
 
-        self.coef_scep = 5  # коэффициент сцепления (про запас)
-        self.has_fco = True
-        self.has_migalka = False
-        self.has_nitro = True
-        self.has_turbo = True
+        self.has_fco = params[2]
+        self.has_migalka = params[3]
+        self.has_nitro = params[4]
+        self.has_turbo = params[5]
+
+        self.turn_speed = params[6]  # скорость поворота
+        self.min_speed = params[7]
+        self.max_speed = params[8]  # макс. скорость автомобиля
+        self.glohnet = params[9]
 
         con.close()
 
@@ -279,7 +284,7 @@ while running:
 
     spawn_traffic(random.randint(0, 100 - traffic_speed))
 
-    text_surface = my_font.render('Счёт: ' + str(car.score), True, 'red')
+    text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
     screen.blit(text_surface, (1150, 0))
     text_surface = my_font.render('Скорость: ' + str(traffic_speed), True, 'red')
     screen.blit(text_surface, (0, 0))

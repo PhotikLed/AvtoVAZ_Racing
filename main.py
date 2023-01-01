@@ -225,7 +225,6 @@ def start_screen():  # менюшка
     start = big_font.render('Старт', True, 'white')
 
     strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
-    # right_button = pygame.transform.scale(strelka, (100, 20))
     right_button = strelka
     left_button = pygame.transform.rotate(right_button, 180)
 

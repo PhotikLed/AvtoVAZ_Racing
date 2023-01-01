@@ -1,6 +1,7 @@
 import random
 import sys
 import sqlite3
+import time
 
 import pygame
 
@@ -102,7 +103,9 @@ class Traffic_car(pygame.sprite.Sprite):
 
     def update(self, speed):
         for trafs in traffic_sprites:
-            if pygame.sprite.collide_mask(trafs, car):  # коллизия
+            # коллизия
+            if pygame.sprite.collide_mask(trafs, car):
+                end_screen()
                 save_record(car.score)
                 terminate()
         if not self.reverse:
@@ -154,8 +157,31 @@ def save_record(rec):
 
 
 def terminate():
+
     pygame.quit()
     sys.exit()
+
+
+def end_screen():
+    fps = 50
+    time.sleep(0.4)
+    fon = fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
+
+    zanovo = my_font.render('Начать заново', True, 'white')
+    menu = my_font.render('Выйти в меню', True, 'white')
+    vyhod = my_font.render('Выйти из игры', True, 'white')
+
+    screen.blit(fon, (0, 0))
+    screen.blit(zanovo, (500, 300))
+    screen.blit(menu, (500, 340))
+    screen.blit(vyhod, (500, 380))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+        pygame.display.flip()
+        clock.tick(fps)
 
 
 def start_screen():  # менюшка
@@ -293,4 +319,5 @@ while running:
     clock.tick(fps)
 
 save_record(car.score)
+end_screen()
 pygame.quit()

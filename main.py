@@ -193,6 +193,7 @@ def end_screen():
                         pass
                     elif y in range(360, 410):
                         start_screen()
+                        return
                     elif y in range(420, 470):
                         terminate()
 

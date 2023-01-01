@@ -172,14 +172,30 @@ def end_screen():
     vyhod = my_font.render('Выйти из игры', True, 'white')
 
     screen.blit(fon, (0, 0))
+
+    pygame.draw.rect(screen, 'black', (500, 300, 218, 50))
+    pygame.draw.rect(screen, 'black', (500, 360, 218, 50))
+    pygame.draw.rect(screen, 'black', (500, 420, 218, 50))
+
     screen.blit(zanovo, (500, 300))
-    screen.blit(menu, (500, 340))
-    screen.blit(vyhod, (500, 380))
+    screen.blit(menu, (500, 360))
+    screen.blit(vyhod, (500, 420))
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+
+                if x in range(500, 718):
+                    if y in range(300, 350):
+                        pass
+                    elif y in range(360, 410):
+                        start_screen()
+                    elif y in range(420, 470):
+                        terminate()
+
         pygame.display.flip()
         clock.tick(fps)
 

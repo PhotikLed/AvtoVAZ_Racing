@@ -115,9 +115,6 @@ class Traffic_car(pygame.sprite.Sprite):
             pygame.sprite.Sprite.kill(self)
 
 
-
-
-
 def spawn_traffic(n):
     if n in [1, 2]:
         Traffic_car(0, traffic_sprites)  # встречка
@@ -176,8 +173,6 @@ def draw_characteristik(tunings: list, index):
 def terminate():
     pygame.quit()
     sys.exit()
-
-
 
 
 class Screens():
@@ -342,9 +337,9 @@ class Screens():
 
                     if x in range(500, 718):
                         if y in range(300, 350):
-                            self.game_screen()
+                            self.game_screen()  # вот тут не понимаю как сделать чтобы всё заново начиналось
                         elif y in range(360, 410):
-                            self.start_screen()
+                            self.start_screen()  # и тут тоже никак не пойму
                             return
                         elif y in range(420, 470):
                             terminate()

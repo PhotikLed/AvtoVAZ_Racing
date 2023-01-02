@@ -57,20 +57,20 @@ class Car(pygame.sprite.Sprite):
         self.glohnet = params[9]
 
     def update(self):
-        global traffic_speed, road_speed
+        # global traffic_speed, road_speed
         keys = pygame.key.get_pressed()
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.rect.top > 0:  # добавил ограничения
             self.rect.y -= self.turn_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.rect.bottom < HEIGHT:
             self.rect.y += self.turn_speed  # скорость поворота
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # скорость машины
-            if traffic_speed < self.max_speed:
-                traffic_speed += 1
-                road_speed += 1
+            if screener.traffic_speed < self.max_speed:
+                screener.traffic_speed += 1
+                screener.road_speed += 1
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            if traffic_speed > self.min_speed:
-                traffic_speed -= 1
-                road_speed -= 1
+            if screener.traffic_speed > self.min_speed:
+                screener.traffic_speed -= 1
+                screener.road_speed -= 1
         if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
 
@@ -103,7 +103,7 @@ class Traffic_car(pygame.sprite.Sprite):
         for trafs in traffic_sprites:
             # коллизия
             if pygame.sprite.collide_mask(trafs, car):
-                end_screen()
+                Screens().end_screen()
                 save_record(car.score)
                 terminate()
         if not self.reverse:
@@ -115,21 +115,7 @@ class Traffic_car(pygame.sprite.Sprite):
             pygame.sprite.Sprite.kill(self)
 
 
-def render_road(shift):  # отрисовка дороги
-    road = pygame.surface.Surface(size)
-    road.fill((90, 90, 90))
-    pygame.draw.rect(road, 'white', (0, 338, 1280, 15))
-    pygame.draw.rect(road, 'black', (0, 338, 1280, 15), 1)
-    pygame.draw.rect(road, 'white', (0, 367, 1280, 15))
-    pygame.draw.rect(road, 'black', (0, 367, 1280, 15), 1)
-    for n in range(8):
-        pygame.draw.rect(road, 'white', (200 * n - shift * road_speed, 162, 100, 15))
-        pygame.draw.rect(road, 'black', (200 * n - shift * road_speed, 162, 100, 15), 1)
 
-        pygame.draw.rect(road, 'white', (200 * n - shift * road_speed, 535, 100, 15))
-        pygame.draw.rect(road, 'black', (200 * n - shift * road_speed, 535, 100, 15), 1)
-
-    return road
 
 
 def spawn_traffic(n):
@@ -192,163 +178,189 @@ def terminate():
     sys.exit()
 
 
-def start_screen():  # менюшка
-
-    fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
-    screen.blit(fon, (0, 0))
-
-    record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
-    start = big_font.render('Старт', True, 'white')
-
-    strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
-    right_button = strelka
-    left_button = pygame.transform.rotate(right_button, 180)
-
-    pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
-
-    beton = pygame.image.load('spirities/roads/beton.png')
-    beton = pygame.transform.scale(beton, (450, 300))
-    screen.blit(beton, (410, 345))
-
-    screen.blit(start, (1040, 600))
-
-    screen.blit(record, (10, 10))
-    screen.blit(right_button, (1050, 400))
-    screen.blit(left_button, (30, 400))
-
-    car = '2101.png'
-
-    jiga01 = pygame.image.load('spirities/tazy/2101.png')
-    jiga01 = pygame.transform.rotate(jiga01, 180)
-    jiga01 = pygame.transform.scale(jiga01, (400, 200))
-
-    jiga09 = pygame.image.load('spirities/tazy/2109.png')
-    jiga09 = pygame.transform.rotate(jiga09, 180)
-    jiga09 = pygame.transform.scale(jiga09, (400, 200))
-
-    priora = pygame.image.load('spirities/tazy/priora.png')
-    priora = pygame.transform.rotate(priora, 180)
-    priora = pygame.transform.scale(priora, (400, 200))
-
-    cars = [jiga01, jiga09, priora]
-    names_cars = ['2101.png', '2109.png', 'priora.png']
-    blits_cars = [vaz_font.render(n.split('.')[0].capitalize(), True, 'orange') for n in names_cars]
-    index = 0
-
-    tunings = get_tuning()
-    draw_characteristik(tunings, index)
-
-    screen.blit(jiga01, (435, 400))
-    screen.blit(blits_cars[index], (480, 345))
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                if x in range(1000, 1280) and \
-                        y in range(600, 720):
-                    return car
-
-                if y in range(400, 550):
-                    if x in range(1050, 1280):
-                        index = (index + 1) % 3
-                    elif x in range(10, 310):
-                        index = abs((index - 1) % 3)
-                    screen.blit(beton, (410, 345))
-                    screen.blit(cars[index], (435, 400))
-                    screen.blit(blits_cars[index], (480, 345))
-                    car = names_cars[index]
-                    draw_characteristik(tunings, index)
-        pygame.display.flip()
-        clock.tick(fps)
 
 
-def end_screen():
-    fps = 50
-    time.sleep(0.4)
-    fon = fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
+class Screens():
+    def __init__(self):
+        self.traffic_sprites = pygame.sprite.Group()
+        self.main_sprites = pygame.sprite.Group()
 
-    zanovo = my_font.render('Начать заново', True, 'white')
-    menu = my_font.render('Выйти в меню', True, 'white')
-    vyhod = my_font.render('Выйти из игры', True, 'white')
+        self.road_shift = 0
+        self.road_speed = 8
+        self.traffic_speed = 5
+        self.clock = pygame.time.Clock()
+        self.fps = 60
 
-    screen.blit(fon, (0, 0))
+        self.timer_interval = 1000  # 1 seconds
+        self.timer_event = pygame.USEREVENT + 1
 
-    pygame.draw.rect(screen, 'black', (500, 300, 218, 50))
-    pygame.draw.rect(screen, 'black', (500, 360, 218, 50))
-    pygame.draw.rect(screen, 'black', (500, 420, 218, 50))
+    def render_road(self, shift):  # отрисовка дороги
+        road = pygame.surface.Surface(size)
+        road.fill((90, 90, 90))
+        pygame.draw.rect(road, 'white', (0, 338, 1280, 15))
+        pygame.draw.rect(road, 'black', (0, 338, 1280, 15), 1)
+        pygame.draw.rect(road, 'white', (0, 367, 1280, 15))
+        pygame.draw.rect(road, 'black', (0, 367, 1280, 15), 1)
+        for n in range(8):
+            pygame.draw.rect(road, 'white', (200 * n - shift * self.road_speed, 162, 100, 15))
+            pygame.draw.rect(road, 'black', (200 * n - shift * self.road_speed, 162, 100, 15), 1)
 
-    screen.blit(zanovo, (500, 300))
-    screen.blit(menu, (500, 360))
-    screen.blit(vyhod, (500, 420))
+            pygame.draw.rect(road, 'white', (200 * n - shift * self.road_speed, 535, 100, 15))
+            pygame.draw.rect(road, 'black', (200 * n - shift * self.road_speed, 535, 100, 15), 1)
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
+        return road
 
-                if x in range(500, 718):
-                    if y in range(300, 350):
-                        pass
-                    elif y in range(360, 410):
-                        start_screen()
-                        return
-                    elif y in range(420, 470):
-                        terminate()
+    def start_screen(self):
 
-        pygame.display.flip()
-        clock.tick(fps)
+        fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
+        start = big_font.render('Старт', True, 'white')
+
+        strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
+        right_button = strelka
+        left_button = pygame.transform.rotate(right_button, 180)
+
+        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+
+        beton = pygame.image.load('spirities/roads/beton.png')
+        beton = pygame.transform.scale(beton, (450, 300))
+        screen.blit(beton, (410, 345))
+
+        screen.blit(start, (1040, 600))
+
+        screen.blit(record, (10, 10))
+        screen.blit(right_button, (1050, 400))
+        screen.blit(left_button, (30, 400))
+
+        car = '2101.png'
+
+        jiga01 = pygame.image.load('spirities/tazy/2101.png')
+        jiga01 = pygame.transform.rotate(jiga01, 180)
+        jiga01 = pygame.transform.scale(jiga01, (400, 200))
+
+        jiga09 = pygame.image.load('spirities/tazy/2109.png')
+        jiga09 = pygame.transform.rotate(jiga09, 180)
+        jiga09 = pygame.transform.scale(jiga09, (400, 200))
+
+        priora = pygame.image.load('spirities/tazy/priora.png')
+        priora = pygame.transform.rotate(priora, 180)
+        priora = pygame.transform.scale(priora, (400, 200))
+
+        cars = [jiga01, jiga09, priora]
+        names_cars = ['2101.png', '2109.png', 'priora.png']
+        blits_cars = [vaz_font.render(n.split('.')[0].capitalize(), True, 'orange') for n in names_cars]
+        index = 0
+
+        tunings = get_tuning()
+        draw_characteristik(tunings, index)
+
+        screen.blit(jiga01, (435, 400))
+        screen.blit(blits_cars[index], (480, 345))
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    if x in range(1000, 1280) and \
+                            y in range(600, 720):
+                        return car
+
+                    if y in range(400, 550):
+                        if x in range(1050, 1280):
+                            index = (index + 1) % 3
+                        elif x in range(10, 310):
+                            index = abs((index - 1) % 3)
+                        screen.blit(beton, (410, 345))
+                        screen.blit(cars[index], (435, 400))
+                        screen.blit(blits_cars[index], (480, 345))
+                        car = names_cars[index]
+                        draw_characteristik(tunings, index)
+            pygame.display.flip()
+            self.clock.tick(self.fps)
+
+    def game_screen(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    save_record(car.score)
+                    terminate()
+                if event.type == self.timer_event:
+                    car.score += 1 + (self.traffic_speed - 5) / 10
+                    # print(car.score)
+
+            screen.blit(self.render_road(self.road_shift), (0, 0))  # блит дороги
+            self.road_shift = (self.road_shift + 1) % (200 / self.road_speed)
+
+            main_sprites.draw(screen)
+            main_sprites.update()
+
+            traffic_sprites.draw(screen)
+            traffic_sprites.update(self.traffic_speed)
+
+            spawn_traffic(random.randint(0, 100 - self.traffic_speed))
+
+            text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
+            screen.blit(text_surface, (1150, 0))
+            text_surface = my_font.render('Скорость: ' + str(self.traffic_speed), True, 'red')
+            screen.blit(text_surface, (0, 0))
+
+            pygame.display.flip()
+            self.clock.tick(self.fps)
+
+        save_record(car.score)
+        screener.end_screen()
+
+    def end_screen(self):
+        time.sleep(0.4)
+        fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
+
+        zanovo = my_font.render('Начать заново', True, 'white')
+        menu = my_font.render('Выйти в меню', True, 'white')
+        vyhod = my_font.render('Выйти из игры', True, 'white')
+
+        screen.blit(fon, (0, 0))
+
+        pygame.draw.rect(screen, 'black', (500, 300, 218, 50))
+        pygame.draw.rect(screen, 'black', (500, 360, 218, 50))
+        pygame.draw.rect(screen, 'black', (500, 420, 218, 50))
+
+        screen.blit(zanovo, (500, 300))
+        screen.blit(menu, (500, 360))
+        screen.blit(vyhod, (500, 420))
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+
+                    if x in range(500, 718):
+                        if y in range(300, 350):
+                            self.game_screen()
+                        elif y in range(360, 410):
+                            self.start_screen()
+                            return
+                        elif y in range(420, 470):
+                            terminate()
+
+            pygame.display.flip()
+            self.clock.tick(self.fps)
 
 
-traffic_sprites = pygame.sprite.Group()
-main_sprites = pygame.sprite.Group()
+if __name__ == '__main__':
+    traffic_sprites = pygame.sprite.Group()
+    main_sprites = pygame.sprite.Group()
 
-road_shift = 0
-road_speed = 8
-traffic_speed = 5
-clock = pygame.time.Clock()
-fps = 60
+    screener = Screens()
 
-timer_interval = 1000  # 1 seconds
-timer_event = pygame.USEREVENT + 1
-pygame.time.set_timer(timer_event, timer_interval)
+    taz = screener.start_screen()
+    car = Car(taz, main_sprites)
+    screener.game_screen()
 
-taz = start_screen()
-car = Car(taz, main_sprites)
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            save_record(car.score)
-            terminate()
-        if event.type == timer_event:
-            car.score += 1 + (traffic_speed - 5) / 10
-            # print(car.score)
-
-    screen.blit(render_road(road_shift), (0, 0))  # блит дороги
-    road_shift = (road_shift + 1) % (200 / road_speed)
-
-    main_sprites.draw(screen)
-    main_sprites.update()
-
-    traffic_sprites.draw(screen)
-    traffic_sprites.update(traffic_speed)
-
-    spawn_traffic(random.randint(0, 100 - traffic_speed))
-
-    text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
-    screen.blit(text_surface, (1150, 0))
-    text_surface = my_font.render('Скорость: ' + str(traffic_speed), True, 'red')
-    screen.blit(text_surface, (0, 0))
-
-    pygame.display.flip()
-    clock.tick(fps)
-
-save_record(car.score)
-end_screen()
-pygame.quit()
+    pygame.quit()

@@ -2,12 +2,15 @@ import random
 import sys
 import sqlite3
 import time
-
 import pygame
+
+from database_work import *
 
 pygame.init()
 pygame.font.init()
+small_font = pygame.font.SysFont('Comic Sans MS', 20)
 my_font = pygame.font.SysFont('Comic Sans MS', 30)
+middle_font = pygame.font.SysFont('Comic Sans MS', 35)
 big_font = pygame.font.SysFont('Comic Sans MS', 70)
 vaz_font = pygame.font.SysFont('Impact', 50)
 pygame.display.set_caption('АвтоВАЗ_Гонки')
@@ -38,11 +41,8 @@ class Car(pygame.sprite.Sprite):
         pygame.mixer.music.load('TazMusic/yakuba.mp3')
 
     def get_configurations(self, name):
-        con = sqlite3.connect('sysparams/tuning.db')
-        cur = con.cursor()
-        sql = 'SELECT * FROM params WHERE car_id IN (SELECT id FROM cars WHERE car == ?)'
-        params = cur.execute(sql, (name,)).fetchone()
-        print(params)
+
+        params = get_tuning_by_name(name)
 
         self.coef_scep = params[1]  # коэффициент сцепления (про запас)
 
@@ -55,8 +55,6 @@ class Car(pygame.sprite.Sprite):
         self.min_speed = params[7]
         self.max_speed = params[8]  # макс. скорость автомобиля
         self.glohnet = params[9]
-
-        con.close()
 
     def update(self):
         global traffic_speed, road_speed
@@ -156,12 +154,42 @@ def save_record(rec):
             new_record.write(str(rec))
 
 
-def terminate():
+def draw_characteristik(tunings: list, index):
+    pygame.draw.rect(screen, 'black', (840, 0, 520, 335))
 
+    caracteristik = my_font.render("Характеристики автомобиля:", True, 'red')
+    screen.blit(caracteristik, (850, 0))
+
+    rus_bool = {0: 'Нет',
+                1: 'Да'}
+
+    params_text = ["Коэф. сцепления",
+                   "Вспышки ФСО",
+                   "Мигалки",
+                   "Нитро",
+                   "Турбина",
+                   "Скорость поворота",
+                   "Мин. скорость",
+                   "Макс. скорость",
+                   "Глохнет"]
+
+    text_coord = 35
+    for i in range(len(tunings[index]) - 1):
+        if tunings[index][i + 1] <= 1:
+            string_rendered = small_font.render(params_text[i] + ': ' + rus_bool[tunings[index][i + 1]], True, 'white')
+        else:
+            string_rendered = small_font.render(params_text[i] + ': ' + str(tunings[index][i + 1]), True, 'white')
+        intro_rect = string_rendered.get_rect()
+        text_coord += 3
+        intro_rect.top = text_coord
+        intro_rect.x = 850
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+
+def terminate():
     pygame.quit()
     sys.exit()
-
-
 
 
 def end_screen():
@@ -204,24 +232,9 @@ def end_screen():
 
 
 def start_screen():  # менюшка
-    intro_text = ["Если ты зачетный парень, если выглядишь атас,",
-                  "то наверное ты знаешь что такое АвтоВАЗ.",
-                  "",
-                  "Выбери любимый автомобиль:"]
 
     fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    pygame.draw.rect(screen, 'gray', (0, 0, 1280, 240))
-    text_coord = 10
-
-    for line in intro_text:
-        string_rendered = my_font.render(line, True, 'red')
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
 
     record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
     start = big_font.render('Старт', True, 'white')
@@ -234,11 +247,11 @@ def start_screen():  # менюшка
 
     beton = pygame.image.load('spirities/roads/beton.png')
     beton = pygame.transform.scale(beton, (450, 300))
-    screen.blit(beton, (410, 325))
+    screen.blit(beton, (410, 345))
 
     screen.blit(start, (1040, 600))
 
-    screen.blit(record, (1000, 50))
+    screen.blit(record, (10, 10))
     screen.blit(right_button, (1050, 400))
     screen.blit(left_button, (30, 400))
 
@@ -261,6 +274,9 @@ def start_screen():  # менюшка
     blits_cars = [vaz_font.render(n.split('.')[0].capitalize(), True, 'orange') for n in names_cars]
     index = 0
 
+    tunings = get_tuning()
+    draw_characteristik(tunings, index)
+
     screen.blit(jiga01, (435, 400))
     screen.blit(blits_cars[index], (480, 345))
 
@@ -276,17 +292,14 @@ def start_screen():  # менюшка
 
                 if y in range(400, 550):
                     if x in range(1050, 1280):
-                        screen.blit(beton, (410, 325))
                         index = (index + 1) % 3
-                        screen.blit(cars[index], (435, 400))
-                        screen.blit(blits_cars[index], (480, 345))
-                        car = names_cars[index]
                     elif x in range(10, 310):
-                        screen.blit(beton, (410, 325))
                         index = abs((index - 1) % 3)
-                        screen.blit(cars[index], (435, 400))
-                        screen.blit(blits_cars[index], (480, 345))
-                        car = names_cars[index]
+                    screen.blit(beton, (410, 345))
+                    screen.blit(cars[index], (435, 400))
+                    screen.blit(blits_cars[index], (480, 345))
+                    car = names_cars[index]
+                    draw_characteristik(tunings, index)
         pygame.display.flip()
         clock.tick(fps)
 

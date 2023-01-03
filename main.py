@@ -103,8 +103,8 @@ class Traffic_car(pygame.sprite.Sprite):
         for trafs in traffic_sprites:
             # коллизия
             if pygame.sprite.collide_mask(trafs, car):
+                save_record_and_money(car.score)
                 Screens().end_screen()
-                save_record(car.score)
                 terminate()
         if not self.reverse:
             self.rect.x -= 15 + speed
@@ -134,13 +134,18 @@ def get_record():  # узнаем текущий рекорд
         return record
 
 
-def save_record(rec):  # сохраняем рекорд
+def save_record_and_money(rec):  # сохраняем рекорд и плюсуем деньги
     with open('sysparams/record.txt', encoding='utf-8') as shet:
         shet = int(float(shet.readline()))
         rec = int(float(rec))
     if shet < rec:
         with open('sysparams/record.txt', encoding='utf-8', mode='w+') as new_record:
             new_record.write(str(rec))
+
+    cur_money = get_balance()
+    print()
+    with open('sysparams/money.txt', encoding='utf-8', mode='w+') as new_money:
+        new_money.write(str(int(cur_money) + rec))
 
 
 def draw_characteristik(tunings: list, index):  # рисуем характеристики автомобиля в основном окошке
@@ -293,7 +298,7 @@ class Screens():
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    save_record(car.score)
+                    save_record_and_money(car.score)
                     terminate()
                 if event.type == self.timer_event:
                     car.score += 1 + (self.traffic_speed - 5) / 10
@@ -318,7 +323,7 @@ class Screens():
             pygame.display.flip()
             self.clock.tick(self.fps)
 
-        save_record(car.score)
+        save_record_and_money(car.score)
         screener.end_screen()
 
     def end_screen(self):  # финальное окно

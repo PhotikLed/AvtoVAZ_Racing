@@ -40,7 +40,7 @@ class Car(pygame.sprite.Sprite):
         self.gudok.set_volume(0.1)
         pygame.mixer.music.load('TazMusic/yakuba.mp3')
 
-    def get_configurations(self, name):
+    def get_configurations(self, name):  # узнаем характеристики автомобиля
 
         params = get_tuning_by_name(name)
 
@@ -122,19 +122,19 @@ def spawn_traffic(n):
         Traffic_car(1, traffic_sprites)  # поток
 
 
-def get_balance():
+def get_balance():  # узнаем текущий баланс
     with open('sysparams/money.txt', encoding='utf8') as balans:
         balans = balans.readline()
         return balans
 
 
-def get_record():
+def get_record():  # узнаем текущий рекорд
     with open('sysparams/record.txt', encoding='utf-8') as record:
         record = record.readline()
         return record
 
 
-def save_record(rec):
+def save_record(rec):  # сохраняем рекорд
     with open('sysparams/record.txt', encoding='utf-8') as shet:
         shet = int(float(shet.readline()))
         rec = int(float(rec))
@@ -143,7 +143,7 @@ def save_record(rec):
             new_record.write(str(rec))
 
 
-def draw_characteristik(tunings: list, index):
+def draw_characteristik(tunings: list, index):  # рисуем характеристики автомобиля в основном окошке
     pygame.draw.rect(screen, 'black', (840, 0, 520, 335))
 
     caracteristik = my_font.render("Характеристики автомобиля:", True, 'red')
@@ -194,6 +194,7 @@ class Screens():
 
         self.timer_interval = 1000  # 1 seconds
         self.timer_event = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.timer_event, self.timer_interval)
 
     def render_road(self, shift):  # отрисовка дороги
         road = pygame.surface.Surface(size)
@@ -211,17 +212,18 @@ class Screens():
 
         return road
 
-    def start_screen(self):
+    def start_screen(self):  # стартовое окошко
 
         fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
 
         record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
+        balance = my_font.render('Ваш баланс: ' + get_balance() + '$', True, 'gold')
         start = big_font.render('Старт', True, 'white')
 
-        strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
-        right_button = strelka
-        left_button = pygame.transform.rotate(right_button, 180)
+        right_button = strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
+
+        left_button = pygame.transform.rotate(strelka, 180)
 
         pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
 
@@ -231,7 +233,10 @@ class Screens():
 
         screen.blit(start, (1040, 600))
 
-        screen.blit(record, (10, 10))
+        pygame.draw.rect(screen, 'black', (0, 0, 480, 90))
+        screen.blit(record, (1, 0))
+        screen.blit(balance, (1, 40))
+
         screen.blit(right_button, (1050, 400))
         screen.blit(left_button, (30, 400))
 
@@ -283,7 +288,7 @@ class Screens():
             pygame.display.flip()
             self.clock.tick(self.fps)
 
-    def game_screen(self):
+    def game_screen(self):  # сам геймплей
         running = True
         while running:
             for event in pygame.event.get():
@@ -292,7 +297,7 @@ class Screens():
                     terminate()
                 if event.type == self.timer_event:
                     car.score += 1 + (self.traffic_speed - 5) / 10
-                    print(car.score)
+                    # print(car.score)
 
             screen.blit(self.render_road(self.road_shift), (0, 0))  # блит дороги
             self.road_shift = (self.road_shift + 1) % (200 / self.road_speed)
@@ -316,7 +321,7 @@ class Screens():
         save_record(car.score)
         screener.end_screen()
 
-    def end_screen(self):
+    def end_screen(self):  # финальное окно
         time.sleep(0.4)
         fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
 

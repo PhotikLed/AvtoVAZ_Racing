@@ -122,6 +122,12 @@ def spawn_traffic(n):
         Traffic_car(1, traffic_sprites)  # поток
 
 
+def get_balance():
+    with open('sysparams/money.txt', encoding='utf8') as balans:
+        balans = balans.readline()
+        return balans
+
+
 def get_record():
     with open('sysparams/record.txt', encoding='utf-8') as record:
         record = record.readline()
@@ -286,7 +292,7 @@ class Screens():
                     terminate()
                 if event.type == self.timer_event:
                     car.score += 1 + (self.traffic_speed - 5) / 10
-                    # print(car.score)
+                    print(car.score)
 
             screen.blit(self.render_road(self.road_shift), (0, 0))  # блит дороги
             self.road_shift = (self.road_shift + 1) % (200 / self.road_speed)

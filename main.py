@@ -219,26 +219,24 @@ class Screens():
 
     def start_screen(self):  # стартовое окошко
 
-        fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
+        fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))  # делаем фон
         screen.blit(fon, (0, 0))
 
-        record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
+        record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')  # всякий текст
         balance = my_font.render('Ваш баланс: ' + get_balance() + '$', True, 'gold')
         start = big_font.render('Старт', True, 'white')
 
-        right_button = strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
-
+        right_button = strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')  # стрелочки
         left_button = pygame.transform.rotate(strelka, 180)
 
-        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))  # кнопка старт
+        screen.blit(start, (1040, 600))
 
-        beton = pygame.image.load('spirities/roads/beton.png')
+        beton = pygame.image.load('spirities/roads/beton.png')  # то, но чем стоит таз
         beton = pygame.transform.scale(beton, (450, 300))
         screen.blit(beton, (410, 345))
 
-        screen.blit(start, (1040, 600))
-
-        pygame.draw.rect(screen, 'black', (0, 0, 480, 90))
+        pygame.draw.rect(screen, 'black', (0, 0, 480, 90))  # менюшка с баланасом и т.д.
         screen.blit(record, (1, 0))
         screen.blit(balance, (1, 40))
 
@@ -247,7 +245,7 @@ class Screens():
 
         car = '2101.png'
 
-        jiga01 = pygame.image.load('spirities/tazy/2101.png')
+        jiga01 = pygame.image.load('spirities/tazy/2101.png')  # рендерим жиги
         jiga01 = pygame.transform.rotate(jiga01, 180)
         jiga01 = pygame.transform.scale(jiga01, (400, 200))
 

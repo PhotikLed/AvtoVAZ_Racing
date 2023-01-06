@@ -19,3 +19,13 @@ def get_tuning_by_name(name):
     con.close()
 
     return params
+
+
+def has_bought(name):
+    con = sqlite3.connect('sysparams/tuning.db')
+    cur = con.cursor()
+    sql = 'SELECT has_bought FROM buy WHERE car_id IN (SELECT id FROM cars WHERE car == ?)'
+    bought = cur.execute(sql, (name,)).fetchone()
+    con.close()
+    print(bought[0])
+    return bought[0]

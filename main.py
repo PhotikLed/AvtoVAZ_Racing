@@ -225,8 +225,9 @@ class Screens:
         car_filename = '2101.png'
         car_name = '2101'
 
+        cur_balance = get_balance()
         record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')  # всякий текст
-        balance = my_font.render('Ваш баланс: ' + get_balance() + '$', True, 'gold')
+        balance = my_font.render('Ваш баланс: ' + cur_balance + '$', True, 'gold')
 
         start = big_font.render('Старт', True, 'white')
         buy = big_font.render('Купить', True, 'white')
@@ -281,8 +282,16 @@ class Screens:
                     if x in range(1000, 1280) and \
                             y in range(600, 720):
                         if has_bought(car_name):
-
                             return car_filename
+                        else:
+                            price = get_cost(car_name)  # покупка автомобиля
+                            if price <= int(cur_balance):
+                                with open('sysparams/money.txt', encoding='utf-8', mode='w+') as balance:
+                                    balance.write(str(int(cur_balance) - price))
+                                set_bought(car_name)
+
+                                pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+                                screen.blit(start, (1040, 600))
 
                     if y in range(400, 550):
                         if x in range(1050, 1280):
@@ -301,6 +310,9 @@ class Screens:
                             screen.blit(start, (1040, 600))
                         else:
                             screen.blit(buy, (1020, 600))
+
+                            cena = small_font.render(str(get_cost(car_name)) + '$', True, 'gold')
+                            screen.blit(cena, (1100, 690))
             pygame.display.flip()
             self.clock.tick(self.fps)
 

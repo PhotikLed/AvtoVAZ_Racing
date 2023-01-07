@@ -148,6 +148,13 @@ def save_record_and_money(rec):  # сохраняем рекорд и плюсу
         new_money.write(str(int(cur_money) + rec))
 
 
+def update_balance():
+    cur_balance = get_balance()
+    balance = my_font.render('Ваш баланс: ' + cur_balance + '$', True, 'gold')
+
+    pygame.draw.rect(screen, 'black', (0, 40, 480, 50))
+    screen.blit(balance, (1, 40))
+
 def draw_characteristik(tunings: list, index):  # рисуем характеристики автомобиля в основном окошке
     pygame.draw.rect(screen, 'black', (840, 0, 520, 335))
 
@@ -289,6 +296,8 @@ class Screens:
                                 with open('sysparams/money.txt', encoding='utf-8', mode='w+') as balance:
                                     balance.write(str(int(cur_balance) - price))
                                 set_bought(car_name)
+
+                                update_balance()
 
                                 pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
                                 screen.blit(start, (1040, 600))

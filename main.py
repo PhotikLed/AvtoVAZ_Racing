@@ -148,6 +148,13 @@ def save_record_and_money(rec):  # сохраняем рекорд и плюсу
         new_money.write(str(int(cur_money) + rec))
 
 
+def update_balance():
+    cur_balance = get_balance()
+    balance = my_font.render('Ваш баланс: ' + cur_balance + '$', True, 'gold')
+
+    pygame.draw.rect(screen, 'black', (0, 40, 480, 50))
+    screen.blit(balance, (1, 40))
+
 def draw_characteristik(tunings: list, index):  # рисуем характеристики автомобиля в основном окошке
     pygame.draw.rect(screen, 'black', (840, 0, 520, 335))
 
@@ -186,7 +193,7 @@ def terminate():
     sys.exit()
 
 
-class Screens():
+class Screens:
     def __init__(self):
         self.traffic_sprites = pygame.sprite.Group()
         self.main_sprites = pygame.sprite.Group()
@@ -219,35 +226,37 @@ class Screens():
 
     def start_screen(self):  # стартовое окошко
 
-        fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))
+        fon = pygame.transform.scale(pygame.image.load('spirities/fon.png'), (WIDTH, HEIGHT))  # делаем фон
         screen.blit(fon, (0, 0))
 
-        record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')
-        balance = my_font.render('Ваш баланс: ' + get_balance() + '$', True, 'gold')
+        car_filename = '2101.png'
+        car_name = '2101'
+
+        cur_balance = get_balance()
+        record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')  # всякий текст
+        balance = my_font.render('Ваш баланс: ' + cur_balance + '$', True, 'gold')
+
         start = big_font.render('Старт', True, 'white')
+        buy = big_font.render('Купить', True, 'white')
 
-        right_button = strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')
-
+        right_button = strelka = pygame.image.load('spirities/knopki/yellow_strlelka.png')  # стрелочки
         left_button = pygame.transform.rotate(strelka, 180)
 
-        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))  # кнопка старт
+        screen.blit(start, (1040, 600))
 
-        beton = pygame.image.load('spirities/roads/beton.png')
+        beton = pygame.image.load('spirities/roads/beton.png')  # то, но чем стоит таз
         beton = pygame.transform.scale(beton, (450, 300))
         screen.blit(beton, (410, 345))
 
-        screen.blit(start, (1040, 600))
-
-        pygame.draw.rect(screen, 'black', (0, 0, 480, 90))
+        pygame.draw.rect(screen, 'black', (0, 0, 480, 90))  # менюшка с балансом и т.д.
         screen.blit(record, (1, 0))
         screen.blit(balance, (1, 40))
 
         screen.blit(right_button, (1050, 400))
         screen.blit(left_button, (30, 400))
 
-        car = '2101.png'
-
-        jiga01 = pygame.image.load('spirities/tazy/2101.png')
+        jiga01 = pygame.image.load('spirities/tazy/2101.png')  # рендерим жиги
         jiga01 = pygame.transform.rotate(jiga01, 180)
         jiga01 = pygame.transform.scale(jiga01, (400, 200))
 
@@ -261,6 +270,7 @@ class Screens():
 
         cars = [jiga01, jiga09, priora]
         names_cars = ['2101.png', '2109.png', 'priora.png']
+        real_name_cars = ['2101', '2109', 'priora']
         blits_cars = [vaz_font.render(n.split('.')[0].capitalize(), True, 'orange') for n in names_cars]
         index = 0
 
@@ -278,7 +288,19 @@ class Screens():
                     x, y = event.pos
                     if x in range(1000, 1280) and \
                             y in range(600, 720):
-                        return car
+                        if has_bought(car_name):
+                            return car_filename
+                        else:
+                            price = get_cost(car_name)  # покупка автомобиля
+                            if price <= int(cur_balance):
+                                with open('sysparams/money.txt', encoding='utf-8', mode='w+') as balance:
+                                    balance.write(str(int(cur_balance) - price))
+                                set_bought(car_name)
+
+                                update_balance()
+
+                                pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+                                screen.blit(start, (1040, 600))
 
                     if y in range(400, 550):
                         if x in range(1050, 1280):
@@ -288,8 +310,18 @@ class Screens():
                         screen.blit(beton, (410, 345))
                         screen.blit(cars[index], (435, 400))
                         screen.blit(blits_cars[index], (480, 345))
-                        car = names_cars[index]
+                        car_filename = names_cars[index]
+                        car_name = real_name_cars[index]
                         draw_characteristik(tunings, index)
+
+                        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+                        if has_bought(car_name):
+                            screen.blit(start, (1040, 600))
+                        else:
+                            screen.blit(buy, (1020, 600))
+
+                            cena = small_font.render(str(get_cost(car_name)) + '$', True, 'gold')
+                            screen.blit(cena, (1100, 690))
             pygame.display.flip()
             self.clock.tick(self.fps)
 
@@ -329,12 +361,11 @@ class Screens():
     def end_screen(self):  # финальное окно
         time.sleep(0.4)
         fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
 
         zanovo = my_font.render('Начать заново', True, 'white')
         menu = my_font.render('Выйти в меню', True, 'white')
         vyhod = my_font.render('Выйти из игры', True, 'white')
-
-        screen.blit(fon, (0, 0))
 
         pygame.draw.rect(screen, 'black', (500, 300, 218, 50))
         pygame.draw.rect(screen, 'black', (500, 360, 218, 50))

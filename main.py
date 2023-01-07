@@ -143,7 +143,6 @@ def save_record_and_money(rec):  # сохраняем рекорд и плюсу
             new_record.write(str(rec))
 
     cur_money = get_balance()
-    print()
     with open('sysparams/money.txt', encoding='utf-8', mode='w+') as new_money:
         new_money.write(str(int(cur_money) + rec))
 
@@ -155,11 +154,15 @@ def update_balance():
     pygame.draw.rect(screen, 'black', (0, 40, 480, 50))
     screen.blit(balance, (1, 40))
 
+
 def draw_characteristik(tunings: list, index):  # рисуем характеристики автомобиля в основном окошке
     pygame.draw.rect(screen, 'black', (840, 0, 520, 335))
 
     caracteristik = my_font.render("Характеристики автомобиля:", True, 'red')
     screen.blit(caracteristik, (850, 0))
+
+    upgrade_button = pygame.image.load('spirities/knopki/upgrade.png')
+    upgrade_button = pygame.transform.scale(upgrade_button, (30, 30))
 
     rus_bool = {0: 'Нет',
                 1: 'Да'}
@@ -186,6 +189,8 @@ def draw_characteristik(tunings: list, index):  # рисуем характер�
         intro_rect.x = 850
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
+        screen.blit(upgrade_button, (1060, text_coord - 30))
 
 
 def terminate():

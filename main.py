@@ -5,6 +5,7 @@ import time
 import pygame
 
 from database_work import *
+from dialogs import *
 
 pygame.init()
 pygame.font.init()
@@ -199,6 +200,22 @@ def terminate():
 
 
 class Screens:
+    upgrade_buttons = {
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': [],
+        '': []
+    }
+
     def __init__(self):
         self.traffic_sprites = pygame.sprite.Group()
         self.main_sprites = pygame.sprite.Group()
@@ -294,7 +311,7 @@ class Screens:
                     if x in range(1000, 1280) and \
                             y in range(600, 720):
                         if has_bought(car_name):
-                            return car_filename
+                            return car_filename  # старт игры
                         else:
                             price = get_cost(car_name)  # покупка автомобиля
                             if price <= int(cur_balance):
@@ -307,7 +324,7 @@ class Screens:
                                 pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
                                 screen.blit(start, (1040, 600))
 
-                    if y in range(400, 550):
+                    if y in range(400, 550):  # листание машинок
                         if x in range(1050, 1280):
                             index = (index + 1) % 3
                         elif x in range(10, 310):
@@ -319,7 +336,7 @@ class Screens:
                         car_name = real_name_cars[index]
                         draw_characteristik(tunings, index)
 
-                        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))
+                        pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))  # отрисовка кнопки Старт\Купить
                         if has_bought(car_name):
                             screen.blit(start, (1040, 600))
                         else:
@@ -327,6 +344,9 @@ class Screens:
 
                             cena = small_font.render(str(get_cost(car_name)) + '$', True, 'gold')
                             screen.blit(cena, (1100, 690))
+
+                    if x in range(1060, 1090):  # кнопки тюнинга
+                        pass
             pygame.display.flip()
             self.clock.tick(self.fps)
 
@@ -391,8 +411,17 @@ class Screens:
                         if y in range(300, 350):
                             self.game_screen()  # вот тут не понимаю как сделать чтобы всё заново начиналось
                         elif y in range(360, 410):
-                            self.start_screen()  # и тут тоже никак не пойму
-                            return
+                            traffic_sprites = pygame.sprite.Group()
+                            main_sprites = pygame.sprite.Group()
+
+                            screener = Screens()
+
+                            taz = screener.start_screen()
+                            car = Car(taz, main_sprites)
+                            screener.game_screen()
+
+                            pygame.quit()  # и тут тоже никак не пойму
+
                         elif y in range(420, 470):
                             terminate()
 

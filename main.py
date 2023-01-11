@@ -346,7 +346,8 @@ class Screens:
                             screen.blit(cena, (1100, 690))
 
                     if x in range(1060, 1090):  # кнопки тюнинга
-                        pass
+                        if y in range(35, 320):
+                            print((y - 35) // 30)
             pygame.display.flip()
             self.clock.tick(self.fps)
 

@@ -200,21 +200,7 @@ def terminate():
 
 
 class Screens:
-    upgrade_buttons = {
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': [],
-        '': []
-    }
+
 
     def __init__(self):
         self.traffic_sprites = pygame.sprite.Group()
@@ -229,6 +215,19 @@ class Screens:
         self.timer_interval = 1000  # 1 seconds
         self.timer_event = pygame.USEREVENT + 1
         pygame.time.set_timer(self.timer_event, self.timer_interval)
+
+        self.upgrade_buttons = [
+            'coef_scpleniya',
+            'fco',
+            'police_lights',
+            'nitro',
+            'turbo',
+            'turn_speed',
+            'min_speed',
+            'max_speed',
+            'glohnet',
+            'glohnet'
+        ]
 
     def render_road(self, shift):  # отрисовка дороги
         road = pygame.surface.Surface(size)
@@ -347,7 +346,8 @@ class Screens:
 
                     if x in range(1060, 1090):  # кнопки тюнинга
                         if y in range(35, 320):
-                            print((y - 35) // 30)
+                            tuning_dialog(self.upgrade_buttons[(y - 35) // 30])
+
             pygame.display.flip()
             self.clock.tick(self.fps)
 

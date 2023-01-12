@@ -50,3 +50,24 @@ def set_bought(name):
     cur.execute(sql, (name,))
     con.commit()
     con.close()
+
+
+def get_tun_price(tun):
+    con = sqlite3.connect('sysparams/tuning.db')
+    cur = con.cursor()
+    sql = 'SELECT price FROM tuning_price WHERE name = ?'
+    price = cur.execute(sql, (tun,)).fetchone()
+    con.close()
+
+    return price[0]
+
+
+def update_upgrade(tun):
+    con = sqlite3.connect('sysparams/tuning.db')
+    cur = con.cursor()
+    sql = '''UPDATE tuning_price
+            SET has_bought = 1
+            WHERE car_id IN (SELECT id FROM cars WHERE car == ?)'''
+    cur.execute(sql, (tun,))
+    con.commit()
+    con.close()

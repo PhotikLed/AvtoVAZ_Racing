@@ -201,7 +201,6 @@ def terminate():
 
 class Screens:
 
-
     def __init__(self):
         self.traffic_sprites = pygame.sprite.Group()
         self.main_sprites = pygame.sprite.Group()
@@ -412,6 +411,7 @@ class Screens:
                         if y in range(300, 350):
                             self.game_screen()  # вот тут не понимаю как сделать чтобы всё заново начиналось
                         elif y in range(360, 410):
+
                             traffic_sprites = pygame.sprite.Group()
                             main_sprites = pygame.sprite.Group()
 
@@ -421,7 +421,7 @@ class Screens:
                             car = Car(taz, main_sprites)
                             screener.game_screen()
 
-                            pygame.quit()  # и тут тоже никак не пойму
+                            # и тут тоже никак не пойму
 
                         elif y in range(420, 470):
                             terminate()
@@ -439,5 +439,3 @@ if __name__ == '__main__':
     taz = screener.start_screen()
     car = Car(taz, main_sprites)
     screener.game_screen()
-
-    pygame.quit()

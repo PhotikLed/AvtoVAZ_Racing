@@ -90,15 +90,16 @@ class Traffic_car(pygame.sprite.Sprite):
         pygame.draw.rect(surf, 'white', (x1 + 30, y1 + 30, x2 - 30, y2 - 30))
         self.mask = pygame.mask.from_surface(surf)
 
+        # while len(pygame.sprite.spritecollide(self, traffic_sprites, False)) > 1:
         self.set_position()
 
     def set_position(self):
         line = random.randint(0, 1)
         # while len(pygame.sprite.spritecollide(self, traffic_sprites, False)) > 1:
         if not self.reverse:
-            self.rect.topleft = WIDTH + 100, random.randint(5 + 165 * line, 60 + 170 * line)
+            self.rect.topleft = WIDTH + 100, random.randint(5 + 165 * line, 60 + 200 * line)
         else:
-            self.rect.topleft = WIDTH + 100, random.randint(390 + 165 * line, 445 + 165 * line)
+            self.rect.topleft = WIDTH + 100, random.randint(370 + 165 * line, 445 + 165 * line)
 
     def update(self, speed):
         for trafs in traffic_sprites:
@@ -370,7 +371,7 @@ class Screens:
             traffic_sprites.draw(screen)
             traffic_sprites.update(self.traffic_speed)
 
-            spawn_traffic(random.randint(0, 100 - self.traffic_speed))
+            spawn_traffic(random.randint(0, 70 - self.traffic_speed))
 
             text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
             screen.blit(text_surface, (1150, 0))

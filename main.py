@@ -20,10 +20,12 @@ screen = pygame.display.set_mode(size)
 
 
 class Car(pygame.sprite.Sprite):
-    score = 0
+    # score = 0
 
     def __init__(self, name: str, *group):
         super(Car, self).__init__(*group)
+        self.score = 0
+
         self.image = pygame.image.load(f'spirities/tazy/{name}')
         self.image = pygame.transform.scale(self.image, (200, 100))  # уменьшаем изображение
         self.image = pygame.transform.rotate(self.image, 180)
@@ -74,6 +76,9 @@ class Car(pygame.sprite.Sprite):
                 screener.road_speed -= 1
         if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
+        if keys[pygame.K_z]:
+
+            Screens().end_screen()
 
 
 class Traffic_car(pygame.sprite.Sprite):
@@ -351,8 +356,8 @@ class Screens:
             self.clock.tick(self.fps)
 
     def game_screen(self):  # сам геймплей
-        running = True
-        while running:
+        running_game = True
+        while running_game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     save_record_and_money(car.score)
@@ -384,6 +389,9 @@ class Screens:
         screener.end_screen()
 
     def end_screen(self):  # финальное окно
+        for sprite in traffic_sprites:
+            if isinstance(sprite, Traffic_car):
+                sprite.kill()
         time.sleep(0.4)
         fon = pygame.transform.scale(pygame.image.load('spirities/gai.png'), (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
@@ -411,15 +419,7 @@ class Screens:
                         if y in range(300, 350):
                             self.game_screen()  # вот тут не понимаю как сделать чтобы всё заново начиналось
                         elif y in range(360, 410):
-
-                            traffic_sprites = pygame.sprite.Group()
-                            main_sprites = pygame.sprite.Group()
-
-                            screener = Screens()
-
-                            taz = screener.start_screen()
-                            car = Car(taz, main_sprites)
-                            screener.game_screen()
+                            start()
 
                             # и тут тоже никак не пойму
 
@@ -428,6 +428,18 @@ class Screens:
 
             pygame.display.flip()
             self.clock.tick(self.fps)
+
+
+def start():
+    traffic_sprites = pygame.sprite.Group()
+    main_sprites = pygame.sprite.Group()
+
+    screener = Screens()
+
+
+    taz = screener.start_screen()
+    car = Car(taz, main_sprites)
+    screener.game_screen()
 
 
 if __name__ == '__main__':

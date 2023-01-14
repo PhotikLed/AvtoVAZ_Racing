@@ -20,10 +20,12 @@ screen = pygame.display.set_mode(size)
 
 
 class Car(pygame.sprite.Sprite):
-    score = 0
+    # score = 0
 
     def __init__(self, name: str, *group):
         super(Car, self).__init__(*group)
+        self.score = 0
+
         self.image = pygame.image.load(f'spirities/tazy/{name}')
         self.image = pygame.transform.scale(self.image, (200, 100))  # уменьшаем изображение
         self.image = pygame.transform.rotate(self.image, 180)
@@ -433,6 +435,7 @@ def start():
     main_sprites = pygame.sprite.Group()
 
     screener = Screens()
+
 
     taz = screener.start_screen()
     car = Car(taz, main_sprites)

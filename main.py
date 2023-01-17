@@ -25,6 +25,7 @@ class Car(pygame.sprite.Sprite):
     def __init__(self, name: str, *group):
         super(Car, self).__init__(*group)
         self.score = 0
+        self.name = name.split('.')[0]
 
         self.image = pygame.image.load(f'spirities/tazy/{name}')
         self.image = pygame.transform.scale(self.image, (200, 100))  # уменьшаем изображение
@@ -77,7 +78,6 @@ class Car(pygame.sprite.Sprite):
         if keys[pygame.K_b]:  # бибикалка
             self.gudok.play()
         if keys[pygame.K_z]:
-
             Screens().end_screen()
 
 
@@ -207,8 +207,7 @@ def terminate():
 class Screens:
 
     def __init__(self):
-        self.traffic_sprites = pygame.sprite.Group()
-        self.main_sprites = pygame.sprite.Group()
+        self.car_name = '2101'
 
         self.road_shift = 0
         self.road_speed = 8
@@ -255,7 +254,6 @@ class Screens:
         screen.blit(fon, (0, 0))
 
         car_filename = '2101.png'
-        car_name = '2101'
 
         cur_balance = get_balance()
         record = my_font.render('Ваш рекорд: ' + get_record(), True, 'green')  # всякий текст
@@ -313,14 +311,14 @@ class Screens:
                     x, y = event.pos
                     if x in range(1000, 1280) and \
                             y in range(600, 720):
-                        if has_bought(car_name):
+                        if has_bought(self.car_name):
                             return car_filename  # старт игры
                         else:
-                            price = get_cost(car_name)  # покупка автомобиля
+                            price = get_cost(self.car_name)  # покупка автомобиля
                             if price <= int(cur_balance):
                                 with open('sysparams/money.txt', encoding='utf-8', mode='w+') as balance:
                                     balance.write(str(int(cur_balance) - price))
-                                set_bought(car_name)
+                                set_bought(self.car_name)
 
                                 update_balance()
 
@@ -336,21 +334,21 @@ class Screens:
                         screen.blit(cars[index], (435, 400))
                         screen.blit(blits_cars[index], (480, 345))
                         car_filename = names_cars[index]
-                        car_name = real_name_cars[index]
+                        self.car_name = real_name_cars[index]
                         draw_characteristik(tunings, index)
 
                         pygame.draw.rect(screen, 'red', (1000, 600, 1280, 720))  # отрисовка кнопки Старт\Купить
-                        if has_bought(car_name):
+                        if has_bought(self.car_name):
                             screen.blit(start, (1040, 600))
                         else:
                             screen.blit(buy, (1020, 600))
 
-                            cena = small_font.render(str(get_cost(car_name)) + '$', True, 'gold')
+                            cena = small_font.render(str(get_cost(self.car_name)) + '$', True, 'gold')
                             screen.blit(cena, (1100, 690))
 
                     if x in range(1060, 1090):  # кнопки тюнинга
                         if y in range(35, 320):
-                            tuning_dialog(self.upgrade_buttons[(y - 35) // 30])
+                            tuning_dialog(self.upgrade_buttons[(y - 35) // 30], self.car_name)
 
             pygame.display.flip()
             self.clock.tick(self.fps)
@@ -435,7 +433,6 @@ def start():
     main_sprites = pygame.sprite.Group()
 
     screener = Screens()
-
 
     taz = screener.start_screen()
     car = Car(taz, main_sprites)

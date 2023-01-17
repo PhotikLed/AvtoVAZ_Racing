@@ -34,7 +34,7 @@ class Car(pygame.sprite.Sprite):
         surf = pygame.Surface((self.rect.w, self.rect.h), pygame.SRCALPHA)
         x1, y1, x2, y2 = self.image.get_rect()
         pygame.draw.rect(surf, 'white',
-                         (x1 + 30, y1 + 30, x2 - 30, y2 - 30))  # тут фигня с модернизированной коллизией
+                         (x1 + 25, y1 + 25, x2 - 25, y2 - 25))  # тут фигня с модернизированной коллизией
         self.mask = pygame.mask.from_surface(surf)
         self.rect.topleft = 20, 400
 
@@ -92,7 +92,7 @@ class Traffic_car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         surf = pygame.Surface((self.rect.w, self.rect.h), pygame.SRCALPHA)
         x1, y1, x2, y2 = self.image.get_rect()
-        pygame.draw.rect(surf, 'white', (x1 + 30, y1 + 30, x2 - 30, y2 - 30))
+        pygame.draw.rect(surf, 'white', (x1 + 25, y1 + 25, x2 - 25, y2 - 25))
         self.mask = pygame.mask.from_surface(surf)
 
         self.set_position()

@@ -54,9 +54,8 @@ def set_bought(name):
 def get_tun_price(tun, car):
     con = sqlite3.connect('sysparams/tuning.db')
     cur = con.cursor()
-    table = car + '_upgrades'
-    sql = 'SELECT price FROM ? WHERE name == ?'
-    price = cur.execute(sql, (table, tun)).fetchone()
+    sql = f'SELECT price FROM {car}_upgrades WHERE name = ?'
+    price = cur.execute(sql, (car, tun)).fetchone()
     con.close()
 
     return price[0]

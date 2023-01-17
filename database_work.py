@@ -54,7 +54,7 @@ def set_bought(name):
 def get_tun_price(tun, car):
     con = sqlite3.connect('sysparams/tuning.db')
     cur = con.cursor()
-    sql = f'SELECT price FROM {car}_upgrades WHERE name = ?'
+    sql = f'SELECT price FROM upgrades_{car} WHERE name = ?'
     price = cur.execute(sql, (car, tun)).fetchone()
     con.close()
 
@@ -64,7 +64,7 @@ def get_tun_price(tun, car):
 def get_max_and_cur_count_of_upgrades(tun, car):
     con = sqlite3.connect('sysparams/tuning.db')
     cur = con.cursor()
-    sql = f'SELECT cur_upgrades, max_upgrades FROM {car}_upgrades WHERE name = ?'
+    sql = f'SELECT cur_upgrades, max_upgrades FROM upgrades_{car} WHERE name = ?'
     cur_count, max_count = cur.execute(sql, (tun,)).fetchone()
     con.close()
 
@@ -74,7 +74,7 @@ def get_max_and_cur_count_of_upgrades(tun, car):
 def get_size_upgrade(tun, car):
     con = sqlite3.connect('sysparams/tuning.db')
     cur = con.cursor()
-    sql = f'SELECT size_upgrades FROM {car}_upgrades WHERE name = ?'
+    sql = f'SELECT size_upgrades FROM upgrades_{car} WHERE name = ?'
     size = cur.execute(sql, (tun,)).fetchone()
     con.close()
 
@@ -96,7 +96,7 @@ def set_upgrade(tun, car):
     if cur_count < max_count:
         con = sqlite3.connect('sysparams/tuning.db')
         cur = con.cursor()
-        sql = f'UPDATE {car}_upgrades' \
+        sql = f'UPDATE upgrades_{car}' \
               f'SET cur_upgrades = cur_upgrades + 1' \
               f'WHERE name == ?'
         cur.execute(sql, (tun,))

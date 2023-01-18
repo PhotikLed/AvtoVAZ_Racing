@@ -17,6 +17,7 @@ vaz_font = pygame.font.SysFont('Impact', 50)
 pygame.display.set_caption('АвтоВАЗ_Гонки')
 size = WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode(size)
+traffs = [pygame.image.load(f'traffic_spirities/traf{random.randint(1, 4)}.png') for i in range(1, 5)]
 
 
 class Car(pygame.sprite.Sprite):
@@ -82,28 +83,36 @@ class Car(pygame.sprite.Sprite):
 
 
 class Traffic_car(pygame.sprite.Sprite):
-    image = pygame.image.load('traffic_spirities/traf1.png')
+    image = pygame.image.load(f'traffic_spirities/traf1.png')
     image = pygame.transform.scale(image, (200, 100))
 
     def __init__(self, reverse, *groups):
         super(Traffic_car, self).__init__(*groups)
+        self.img = random.choice(traffs)
         self.reverse = reverse
-        self.image = pygame.transform.rotate(Traffic_car.image, 180) if reverse else Traffic_car.image
+        self.image = pygame.transform.rotate(self.img, 180) if reverse else self.img
         self.rect = self.image.get_rect()
+        self.rect.topright = 0, 0
         surf = pygame.Surface((self.rect.w, self.rect.h), pygame.SRCALPHA)
         x1, y1, x2, y2 = self.image.get_rect()
         pygame.draw.rect(surf, 'white', (x1 + 25, y1 + 25, x2 - 25, y2 - 25))
         self.mask = pygame.mask.from_surface(surf)
 
-        self.set_position()
+        while len(pygame.sprite.spritecollide(self, traffic_sprites, False)) > 1:
+            n = 1
+            print(pygame.sprite.spritecollide(self, traffic_sprites, False))
+            self.set_position(reverse)
+            n += 1
+            if n > 100:
+                pygame.sprite.Sprite.kill(self)
+                n = 0
 
-    def set_position(self):
-        line = random.randint(0, 1)
+    def set_position(self, line):
         # while len(pygame.sprite.spritecollide(self, traffic_sprites, False)) > 1:
-        if not self.reverse:
-            self.rect.topleft = WIDTH + 100, random.randint(5 + 165 * line, 60 + 170 * line)
+        if line == 0:
+            self.rect.topleft = WIDTH + 100, random.randint(5, 255)
         else:
-            self.rect.topleft = WIDTH + 100, random.randint(390 + 165 * line, 445 + 165 * line)
+            self.rect.topleft = WIDTH + 100, random.randint(365, 615)
 
     def update(self, speed):
         for trafs in traffic_sprites:
@@ -117,14 +126,15 @@ class Traffic_car(pygame.sprite.Sprite):
         if self.reverse:
             self.rect.x -= speed
 
-        if self.rect.right < 0:
+        if self.rect.topright < (-500, 0):
             pygame.sprite.Sprite.kill(self)
+            Traffic_car(random.randint(0, 1), traffic_sprites)
 
 
 def spawn_traffic(n):
-    if n in [1, 2]:
+    if n in range(1, 5):
         Traffic_car(0, traffic_sprites)  # встречка
-    if n == 0:
+    if n in range(50, 60):
         Traffic_car(1, traffic_sprites)  # поток
 
 
@@ -373,7 +383,8 @@ class Screens:
             traffic_sprites.draw(screen)
             traffic_sprites.update(self.traffic_speed)
 
-            spawn_traffic(random.randint(0, 100 - self.traffic_speed))
+            if len(traffic_sprites) < 8:
+                spawn_traffic(random.randint(0, 1000))
 
             text_surface = my_font.render('Счёт: ' + str(int(car.score)), True, 'red')
             screen.blit(text_surface, (1150, 0))
